@@ -1,0 +1,18 @@
+galaxy_info:
+  author: ome-devel@lists.openmicroscopy.org.uk
+  description: Celery distributed processing with Docker
+  company: Open Microscopy Environment
+  license: BSD
+  min_ansible_version: 2.1
+  platforms:
+  - name: EL
+    versions:
+    - 7
+  galaxy_tags: []
+
+dependencies:
+- role: openmicroscopy.basedeps
+- role: openmicroscopy.docker
+  docker_use_ipv4_nic_mtu: True
+- role: openmicroscopy.redis
+  when: celery_docker_setup_redis

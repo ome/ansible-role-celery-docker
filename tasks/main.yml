@@ -1,0 +1,77 @@
+---
+# tasks file for celery-docker
+
+- name: celery docker | install virtualenv
+  become: yes
+  yum:
+    pkg: python-virtualenv
+    state: present
+
+- name: celery docker | create user
+  become: yes
+  user:
+    groups: docker
+    home: "{{ celery_docker_basedir }}"
+    name: celery
+    state: present
+    system: yes
+
+- name: celery docker | create virtualenv
+  pip:
+    name: "{{ item }}"
+    state: present
+    virtualenv: "{{ celery_docker_basedir }}/venv"
+    virtualenv_site_packages: yes
+  with_items:
+    - celery
+    - redis
+
+- name: celery docker | worker directories
+  file:
+    path: "{{ item }}"
+    recurse: yes
+    state: directory
+    owner: celery
+    group: root
+    mode: "0755"
+  with_items:
+  - "{{ celery_docker_basedir }}/worker"
+  - "{{ celery_docker_var_log }}"
+  - "{{ celery_docker_var_run }}"
+
+
+- name: celery docker | worker configuration file
+  template:
+    dest: "{{ celery_docker_basedir }}/worker/celeryconfig.py"
+    src: celery-worker-celeryconfig-py.j2
+  notify:
+  - reload celery-worker
+
+- name: celery docker | worker tasks file
+  copy:
+    dest: "{{ celery_docker_basedir }}/worker/tasks.py"
+    src: celery-worker-tasks.py
+  notify:
+  - reload celery-worker
+
+#- name: celery docker | system configuration options
+#  template:
+#    dest: /etc/sysconfig/celery-docker
+#    src: etc-sysconfig-celery-docker.j2
+#  notify:
+#  - reload celery-worker
+
+- name: celery docker | worker systemd file
+  template:
+    dest: "/etc/systemd/system/celery-worker.service"
+    src: systemd-system-celery-worker-service.j2
+    mode: 0755
+  notify:
+  - reload systemd
+  - reload celery-worker
+
+- name: celery docker | enable service
+  service:
+    name: celery-worker.service
+    enabled: yes
+    state: started

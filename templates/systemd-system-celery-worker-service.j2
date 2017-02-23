@@ -1,0 +1,44 @@
+# {{ ansible_managed }}
+# http://docs.celeryproject.org/en/latest/userguide/daemonizing.html#usage-systemd
+
+[Unit]
+Description=Celery Docker worker
+After=network.target
+
+[Service]
+Type=forking
+#PIDFile=/var/run/celery/celery-docker.pid
+User=celery
+TimeoutStopSec={{ celery_docker_systemd_timeout }}
+WorkingDirectory={{ celery_docker_basedir }}/worker
+
+# http://docs.celeryproject.org/en/latest/userguide/daemonizing.html#generic-systemd-celery-example
+#EnvironmentFile=-/etc/sysconfig/celery
+Environment=CELERYD_NODES=celery-worker-1
+Environment=CELERY_APP=tasks
+Environment=CELERYD_LOG_LEVEL=DEBUG
+#Environment=CELERYD_OPTS="--time-limit=300 --concurrency=8"
+
+
+ExecStart={{ celery_docker_basedir }}/bin/celery \
+    multi start \
+    ${CELERYD_NODES} \
+    -A ${CELERY_APP} \
+    --pidfile="{{ celery_docker_var_run }}/%n.pid" \
+    --logfile="{{ celery_docker_var_log }}/%n%I.log" \
+    --loglevel="${CELERYD_LOG_LEVEL}" \
+    --concurrency={{ celery_docker_concurrency }} \
+    ${CELERYD_OPTS}
+
+ExecStop={{ celery_docker_basedir }}/bin/celery multi stopwait \
+  ${CELERYD_NODES} \
+  --pidfile="{{ celery_docker_var_run }}/%n.pid"
+
+ExecReload={{ celery_docker_basedir }}/bin/celery multi restart \
+  ${CELERYD_NODES} \
+  -A ${CELERY_APP} \
+  --pidfile="{{ celery_docker_var_run }}/%n.pid" \
+  --logfile="{{ celery_docker_var_log }}/%n%I.log" \
+  --loglevel="${CELERYD_LOG_LEVEL}" \
+  --concurrency={{ celery_docker_concurrency }} \
+  ${CELERYD_OPTS}

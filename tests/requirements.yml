@@ -1,0 +1,3 @@
+- src: openmicroscopy.basedeps
+- src: openmicroscopy.docker
+- src: openmicroscopy.redis
