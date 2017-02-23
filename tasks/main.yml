@@ -1,46 +1,69 @@
 ---
 # tasks file for celery-docker
 
-- name: celery docker | install virtualenv
-  become: yes
-  yum:
-    pkg: python-virtualenv
-    state: present
-
 - name: celery docker | create user
   become: yes
   user:
     groups: docker
     home: "{{ celery_docker_basedir }}"
+    createhome: no
     name: celery
     state: present
     system: yes
 
+- name: celery docker | worker directories
+  become:
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: root
+    mode: "0755"
+  with_items:
+  - path: "{{ celery_docker_basedir }}"
+    owner: root
+  - path: "{{ celery_docker_basedir }}/worker"
+    owner: root
+  - path: "{{ celery_docker_var_log }}"
+    owner: celery
+  - path: "{{ celery_docker_var_run }}"
+    owner: celery
+
+# The distribution python-virtualenv is too old
+- name: celery docker | download virtualenv
+  become: yes
+  get_url:
+    url: https://pypi.python.org/packages/d4/0c/9840c08189e030873387a73b90ada981885010dd9aea134d6de30cd24cb8/virtualenv-15.1.0.tar.gz
+    checksum: "md5:44e19f4134906fe2d75124427dc9b716"
+    dest: "{{ celery_docker_basedir }}/virtualenv-15.1.0.tar.gz"
+    force: no
+
+- name: celery docker | install virtualenv
+  become: yes
+  unarchive:
+    src: "{{ celery_docker_basedir }}/virtualenv-15.1.0.tar.gz"
+    # remote_src:
+    dest: "{{ celery_docker_basedir }}"
+    copy: no
+    owner: root
+    group: root
+    mode: u=rwX,g=rX,o=rX
+
 - name: celery docker | create virtualenv
+  become: yes
   pip:
     name: "{{ item }}"
     state: present
     virtualenv: "{{ celery_docker_basedir }}/venv"
-    virtualenv_site_packages: yes
+    virtualenv_command: "{{ celery_docker_basedir }}/virtualenv-15.1.0/virtualenv.py"
+    virtualenv_site_packages: no
   with_items:
     - celery
+    - docker
     - redis
 
-- name: celery docker | worker directories
-  file:
-    path: "{{ item }}"
-    recurse: yes
-    state: directory
-    owner: celery
-    group: root
-    mode: "0755"
-  with_items:
-  - "{{ celery_docker_basedir }}/worker"
-  - "{{ celery_docker_var_log }}"
-  - "{{ celery_docker_var_run }}"
-
-
 - name: celery docker | worker configuration file
+  become: yes
   template:
     dest: "{{ celery_docker_basedir }}/worker/celeryconfig.py"
     src: celery-worker-celeryconfig-py.j2
@@ -48,9 +71,11 @@
   - reload celery-worker
 
 - name: celery docker | worker tasks file
+  become: yes
   copy:
     dest: "{{ celery_docker_basedir }}/worker/tasks.py"
     src: celery-worker-tasks.py
+    mode: 0755
   notify:
   - reload celery-worker
 
@@ -62,6 +87,7 @@
 #  - reload celery-worker
 
 - name: celery docker | worker systemd file
+  become: yes
   template:
     dest: "/etc/systemd/system/celery-worker.service"
     src: systemd-system-celery-worker-service.j2
@@ -71,6 +97,7 @@
   - reload celery-worker
 
 - name: celery docker | enable service
+  become: yes
   service:
     name: celery-worker.service
     enabled: yes

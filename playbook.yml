@@ -2,3 +2,22 @@
 - hosts: all
   roles:
     - role: ansible-role-celery-docker
+      celery_docker_max_retries: 1
+      celery_docker_retry_delay: 1
+
+# Additional tasks for setting up tests
+- hosts: all
+  tasks:
+
+  - name: Create celery test directory
+    become: yes
+    file:
+      path: /tmp/celery
+      owner: celery
+      state: directory
+
+  - name: Create celery test input
+    become: yes
+    copy:
+      dest: /tmp/celery/input.txt
+      content: "hello world"

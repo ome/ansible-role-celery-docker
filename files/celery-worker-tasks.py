@@ -32,7 +32,8 @@ def mkdir_p(path):
 
 # http://docs.celeryproject.org/en/latest/userguide/tasks.html
 @app.task(bind=True)
-def run(self, image, command, logout=None, logerr=None, inputpath=None):
+def run(self, image, command, logoutfile=None, logerr=None,
+        inputpath=None, outputpath=None):
     client = docker.from_env()
     kwargs = dict(
         command=command,
@@ -44,17 +45,29 @@ def run(self, image, command, logout=None, logerr=None, inputpath=None):
     )
     # kwargs['cpu_shares'] = 1
 
+    volumes = {}
     if inputpath:
+        if inputpath == outputpath:
+            raise ValueError(
+                'inputpath cannot be the same as outputpath: %s' % inputpath)
         if not os.path.isabs(inputpath) or not os.path.exists(inputpath):
             raise ValueError(
                 'inputpath must be an existing absolute path: %s' % inputpath)
-        kwargs['volumes'] = {inputpath: {'bind': '/input', 'mode': 'ro'}}
+        volumes[inputpath] = {'bind': '/input', 'mode': 'ro'}
+    if outputpath:
+        if not os.path.isabs(outputpath) or not os.path.exists(outputpath):
+            raise ValueError(
+                'outputpath must be an existing absolute path: %s' %
+                outputpath)
+        volumes[outputpath] = {'bind': '/output', 'mode': 'rw'}
+    if volumes:
+        kwargs['volumes'] = volumes
+        LOGGER.info("volumes: %s" % volumes)
 
-    for fn in logout, logerr:
-        if fn:
-            mkdir_p(os.path.dirname(os.path.abspath(fn)))
-    LOGGER.info("stdout: %s" % logout)
-    # LOGGER.info("stderr: %s" % logerr)
+    if logoutfile:
+        mkdir_p(os.path.dirname(os.path.abspath(logoutfile)))
+        LOGGER.info("stdout: %s" % logoutfile)
+    # if logerr:
 
     try:
         output = client.containers.run(image, **kwargs)
@@ -64,8 +77,9 @@ def run(self, image, command, logout=None, logerr=None, inputpath=None):
         delay = int(uniform(2, 4) ** self.request.retries * delay_base)
         raise self.retry(countdown=delay, exc=e)
 
-    with open(logout, 'w') as f:
-        f.write(output)
+    if logoutfile:
+        with open(logoutfile, 'w') as f:
+            f.write(output)
 
     r = {'id': self.request.id, 'output': output}
     return r
@@ -77,6 +91,8 @@ def main(argv):
         '-v', '--verbose', action='store_true', help='Verbose output')
     parser.add_argument('--inputpath',
                         help='Input path (mounted read-only as /input)')
+    parser.add_argument('--outputpath',
+                        help='Output path (mounted read-write as /output)')
     parser.add_argument('--out', help='Output stdout log file')
     # parser.add_argument('--err', help='Output stderr log file')
     parser.add_argument('image', help='Docker image')
@@ -86,7 +102,8 @@ def main(argv):
     if args.verbose:
         print app.conf.humanize(with_defaults=False, censored=True)
     return run.delay(
-        args.image, args.commands, logout=args.out, inputpath=args.inputpath)
+        args.image, args.commands, logoutfile=args.out,
+        inputpath=args.inputpath, outputpath=args.outputpath)
 
 
 if __name__ == "__main__":

@@ -16,29 +16,31 @@ WorkingDirectory={{ celery_docker_basedir }}/worker
 #EnvironmentFile=-/etc/sysconfig/celery
 Environment=CELERYD_NODES=celery-worker-1
 Environment=CELERY_APP=tasks
-Environment=CELERYD_LOG_LEVEL=DEBUG
-#Environment=CELERYD_OPTS="--time-limit=300 --concurrency=8"
+Environment=CELERYD_LOG_LEVEL={{ celery_docker_log_level }}
+Environment=CELERYD_CONCURRENCY={{ celery_docker_concurrency }}
+#Environment=CELERYD_OPTS="--time-limit=300"
 
-
-ExecStart={{ celery_docker_basedir }}/bin/celery \
+# The docs suggest "%n%I.log" but this doesn't work
+ExecStart=/bin/sh -c '{{ celery_docker_basedir }}/venv/bin/celery \
     multi start \
     ${CELERYD_NODES} \
     -A ${CELERY_APP} \
-    --pidfile="{{ celery_docker_var_run }}/%n.pid" \
-    --logfile="{{ celery_docker_var_log }}/%n%I.log" \
-    --loglevel="${CELERYD_LOG_LEVEL}" \
-    --concurrency={{ celery_docker_concurrency }} \
-    ${CELERYD_OPTS}
+    --pidfile={{ celery_docker_var_run }}/%n.pid \
+    --logfile={{ celery_docker_var_log }}/%n%i.log \
+    --loglevel=${CELERYD_LOG_LEVEL} \
+    --concurrency=${CELERYD_CONCURRENCY} \
+    ${CELERYD_OPTS}'
 
-ExecStop={{ celery_docker_basedir }}/bin/celery multi stopwait \
-  ${CELERYD_NODES} \
-  --pidfile="{{ celery_docker_var_run }}/%n.pid"
+ExecStop=/bin/sh -c '{{ celery_docker_basedir }}/venv/bin/celery \
+    multi stopwait \
+    ${CELERYD_NODES} \
+    --pidfile={{ celery_docker_var_run }}/%n.pid'
 
-ExecReload={{ celery_docker_basedir }}/bin/celery multi restart \
-  ${CELERYD_NODES} \
-  -A ${CELERY_APP} \
-  --pidfile="{{ celery_docker_var_run }}/%n.pid" \
-  --logfile="{{ celery_docker_var_log }}/%n%I.log" \
-  --loglevel="${CELERYD_LOG_LEVEL}" \
-  --concurrency={{ celery_docker_concurrency }} \
-  ${CELERYD_OPTS}
+#ExecReload=/bin/sh -c '{{ celery_docker_basedir }}/venv/bin/celery multi restart \
+#    ${CELERYD_NODES} \
+#    -A ${CELERY_APP} \
+#    --pidfile={{ celery_docker_var_run }}/%n.pid \
+#    --logfile={{ celery_docker_var_log }}/%n%i.log \
+#    --loglevel=${CELERYD_LOG_LEVEL} \
+#    --concurrency=${CELERYD_CONCURRENCY} \
+#    ${CELERYD_OPTS}'

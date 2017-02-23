@@ -7,6 +7,7 @@ celery_docker_basedir: /opt/celery
 celery_docker_setup_redis: True
 celery_docker_var_run: /var/run/celery
 celery_docker_var_log: /var/log/celery
+celery_docker_log_level: DEBUG
 
 # Number of concurrent tasks, 0 = number of CPUs
 celery_docker_concurrency: 0

@@ -1,5 +1,6 @@
 # Celery configuration
 # http://docs.celeryproject.org/en/latest/configuration.html
+# {{ ansible_managed }}
 
 BROKER_URL = '{{ celery_docker_broker_url }}'
 CELERY_RESULT_BACKEND = BROKER_URL
