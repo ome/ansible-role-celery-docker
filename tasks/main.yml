@@ -12,7 +12,7 @@
     system: yes
 
 - name: celery docker | worker directories
-  become:
+  become: yes
   file:
     path: "{{ item.path }}"
     state: directory
