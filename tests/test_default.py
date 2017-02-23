@@ -44,8 +44,9 @@ def test_celery_task(Command, File, Sudo):
 
     flog = File('/tmp/celery/log.out')
     assert flog.exists
-    assert flog.content_string == 'Done'
+    assert flog.content_string.strip() == 'Done'
 
     fout = File('/tmp/celery/output.txt')
     assert fout.exists
-    assert fout.content_string == '5eb63bbbe01eeed093cb22bb8f5acdc3  /input'
+    assert fout.content_string.strip() == \
+        '5eb63bbbe01eeed093cb22bb8f5acdc3  /input'

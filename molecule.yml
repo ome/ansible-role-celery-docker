@@ -3,6 +3,8 @@ dependency:
   name: galaxy
   requirements_file: tests/requirements.yml
 
+# I have no idea how this passes travis since it requires docker in docker
+# but somehow it does ¯\_(ツ)_/¯
 # Default driver
 driver:
   name: docker
@@ -23,7 +25,7 @@ vagrant:
 docker:
   containers:
   - name: celery
-    image: centos/systemd
+    image: manics/centos-systemd-ip-docker
     image_version: latest
     privileged: True
 
