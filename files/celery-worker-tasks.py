@@ -32,8 +32,10 @@ def mkdir_p(path):
 
 # http://docs.celeryproject.org/en/latest/userguide/tasks.html
 @app.task(bind=True)
-def run(self, image, command, logoutfile=None, logerr=None,
-        inputpath=None, outputpath=None):
+def run_docker(self, image, command, user=None,
+               logoutfile=None, logerrfile=None,
+               inputpath=None, outputpath=None):
+
     client = docker.from_env()
     kwargs = dict(
         command=command,
@@ -43,6 +45,8 @@ def run(self, image, command, logoutfile=None, logerr=None,
         stderr=True,
         stdout=True,
     )
+    if user is not None:
+        kwargs['user'] = user
     # kwargs['cpu_shares'] = 1
 
     volumes = {}
@@ -67,8 +71,9 @@ def run(self, image, command, logoutfile=None, logerr=None,
     if logoutfile:
         mkdir_p(os.path.dirname(os.path.abspath(logoutfile)))
         LOGGER.info("stdout: %s" % logoutfile)
-    # if logerr:
+    # if logerrfile:
 
+    # Only retry on ContainerErrors
     try:
         output = client.containers.run(image, **kwargs)
     except docker.errors.ContainerError as e:
@@ -101,7 +106,7 @@ def main(argv):
     args = parser.parse_args(argv[1:])
     if args.verbose:
         print app.conf.humanize(with_defaults=False, censored=True)
-    return run.delay(
+    return run_docker.delay(
         args.image, args.commands, logoutfile=args.out,
         inputpath=args.inputpath, outputpath=args.outputpath)
 
