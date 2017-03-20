@@ -25,8 +25,8 @@ vagrant:
 docker:
   containers:
   - name: celery
-    image: manics/centos-systemd-ip-docker
-    image_version: latest
+    image: openmicroscopy/centos-systemd-ip
+    image_version: 0.1.0
     privileged: True
 
 verifier:
