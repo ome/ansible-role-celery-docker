@@ -39,6 +39,8 @@ Example playbook
 
     - hosts: localhost
       roles:
+      - role: openmicroscopy.docker
+      - role: openmicroscopy.redis
       - role: celery-docker
 
 

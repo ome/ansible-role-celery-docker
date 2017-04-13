@@ -1,6 +1,9 @@
 ---
 - hosts: all
   roles:
+    - role: openmicroscopy.docker
+      docker_use_ipv4_nic_mtu: True
+    - role: openmicroscopy.redis
     - role: ansible-role-celery-docker
       celery_docker_max_retries: 1
       celery_docker_retry_delay: 1
