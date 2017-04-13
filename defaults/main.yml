@@ -4,7 +4,6 @@
 celery_docker_broker_url: "redis://localhost:6379/0"
 celery_docker_basedir: /opt/celery
 
-celery_docker_setup_redis: True
 celery_docker_var_run: /var/run/celery
 celery_docker_var_log: /var/log/celery
 celery_docker_log_level: DEBUG
