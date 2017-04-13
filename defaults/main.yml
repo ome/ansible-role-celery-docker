@@ -2,10 +2,6 @@
 # defaults file for celery-docker
 
 celery_docker_broker_url: "redis://localhost:6379/0"
-celery_docker_basedir: /opt/celery
-
-celery_docker_var_run: /var/run/celery
-celery_docker_var_log: /var/log/celery
 celery_docker_log_level: DEBUG
 
 # Number of concurrent tasks, 0 = number of CPUs
@@ -16,3 +12,13 @@ celery_docker_retry_delay: 10
 celery_docker_store_tasks_hours: 384
 
 celery_docker_systemd_timeout: 7200
+
+
+######################################################################
+# Expert users only!
+######################################################################
+
+celery_docker_basedir: /opt/celery
+
+celery_docker_var_run: /var/run/celery
+celery_docker_var_log: /var/log/celery
