@@ -35,6 +35,20 @@ def mkdir_p(path):
 def run_docker(self, image, command, user=None,
                logoutfile=None, logerrfile=None,
                inputpath=None, outputpath=None):
+    """
+    :param image: Docker image, may include a tag
+    :param command: Command line to be passed to image
+    :param user: Run the container as this user
+    :param logoutfile: Absolute host path to an output log file, the parent
+           directory must already exist and must be writeable by the `celery`
+           user
+    :param logerrfile: Not implemented
+    :param inputpath: Absolute host path to the input directory or file,
+           this will be mounted read-only in the container as `/input`
+    :param inputpath: Absolute host path to the output directory or file,
+           this will be mounted in the container as `/output`, must already
+           exist
+    """
 
     client = docker.from_env()
     kwargs = dict(
