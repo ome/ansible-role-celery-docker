@@ -9,29 +9,31 @@ Dependencies
 
 See `meta/main.yml`
 
-Note that this uses `openmicroscopy.redis` by default.
-If you have multiple redis users you may want to adjust the database used by each of them.
+This role requires Docker to be running on the target hosts.
+Celery requires a broker such as Redis, either on the current or a remote server.
+
+For example, you can use the `openmicroscopy.docker` and `openmicroscopy.redis` roles to set them up, see the example playbook.
 
 
 Usage
 -----
 
 This role creates a celery worker that launches docker containers.
-For example, the following will submit a task:
+At present a single task is defined, `run_docker`.
+See [celery-worker-tasks.py `run_docker`](files/celery-worker-tasks.py) for a description of the parameters.
 
-    /opt/celery/venv/bin/python /opt/celery/worker/tasks.py
-      --inputpath /celery/in --outputpath /celery/out --out /celery/output.log
-      busybox -- sh -c 'date > /output/date.txt'
+Tasks can be submitted in two ways:
 
-### Parameters
-- `--inputpath /INPUT/PATH`: Input file or directory, mounted inside the Docker container as `/input`
-- `--outputpath /OUTPUT/PATH`: Output file or directory, mounted inside the Docker container as `/output`.
-  The user is responsible for ensuring it is writeable by the Docker container if necessary.
+- Submit a `run_docker` task with arguments passed as a dictionary.
+  For an example of this see [celery-submit-example.py](files/celery-submit-example.py).
 
-For more details run:
+- Run the tasks file directly (a `main` function is included):
 
-    /opt/celery/venv/bin/python /opt/celery/worker/tasks.py --help
+        /opt/celery/venv/bin/python /opt/celery/worker/tasks.py --help
 
+        /opt/celery/venv/bin/python /opt/celery/worker/tasks.py
+          --inputpath /celery/in --outputpath /celery/out --out /celery/output.log
+          busybox -- sh -c 'date > /output/date.txt'
 
 
 Example playbook
