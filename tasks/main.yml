@@ -91,7 +91,6 @@
   template:
     dest: "/etc/systemd/system/celery-worker.service"
     src: systemd-system-celery-worker-service.j2
-    mode: 0755
   notify:
   - reload systemd
   - reload celery-worker
