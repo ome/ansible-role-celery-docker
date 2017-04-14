@@ -80,6 +80,7 @@
   - reload celery-worker
 
 - name: celery docker | system configuration options
+  become: yes
   template:
     dest: /etc/sysconfig/celery-worker
     src: sysconfig-celery-worker.j2
