@@ -7,6 +7,9 @@ celery_docker_log_level: DEBUG
 # Number of concurrent tasks, 0 = number of CPUs
 celery_docker_concurrency: 0
 
+# Additional options for celery worker
+celery_docker_opts: ""
+
 celery_docker_max_retries: 3
 celery_docker_retry_delay: 10
 celery_docker_store_tasks_hours: 384

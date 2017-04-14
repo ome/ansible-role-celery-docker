@@ -79,12 +79,12 @@
   notify:
   - reload celery-worker
 
-#- name: celery docker | system configuration options
-#  template:
-#    dest: /etc/sysconfig/celery-docker
-#    src: etc-sysconfig-celery-docker.j2
-#  notify:
-#  - reload celery-worker
+- name: celery docker | system configuration options
+  template:
+    dest: /etc/sysconfig/celery-worker
+    src: sysconfig-celery-worker.j2
+  notify:
+  - reload celery-worker
 
 - name: celery docker | worker systemd file
   become: yes

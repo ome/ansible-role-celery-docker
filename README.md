@@ -23,6 +23,7 @@ All variables are optional:
 - `celery_docker_broker_url`: The URL to the broker, e.g. `redis://HOST:PORT/DB`, default is redis on localhost
 - `celery_docker_log_level`: Celery worker log level, default `DEBUG`
 - `celery_docker_concurrency`: Number of concurrent tasks, default is number of CPUs
+- `celery_docker_opts`: Additional options for celery worker
 - `celery_docker_max_retries`: Maximum number of times to retry if the `docker` command fails, default `3`
 - `celery_docker_retry_delay`: Delay (seconds) before retrying a failed task, default `10`
 - `celery_docker_store_tasks_hours`: Store completed tasks in the broker for this number of hours, default `384` (16 days)
