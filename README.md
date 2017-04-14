@@ -42,7 +42,7 @@ Tasks can be submitted in two ways:
 - Submit a `run_docker` task with arguments passed as a dictionary.
   For an example of this see [celery-submit-example.py](files/celery-submit-example.py).
 
-- Run the tasks file directly (a `main` function is included):
+- Run the [tasks file](files/celery-worker-tasks.py) directly (a `main` function is included):
 
         /opt/celery/venv/bin/python /opt/celery/worker/tasks.py --help
 
@@ -59,6 +59,30 @@ Example playbook
       - role: openmicroscopy.docker
       - role: openmicroscopy.redis
       - role: celery-docker
+
+
+Advanced setup
+--------------
+
+### Redis security
+
+You can set a [password and other configuration options](http://docs.celeryproject.org/en/latest/getting-started/brokers/redis.html) when starting Redis (`--requirepass`), or in the Redis configuration file.
+All communication is in plain text so this does not guard against network sniffing.
+Redis can [write its data to disk](http://redis.io/topics/persistence) and reload it on startup (`--appendonly yes`) instead of running as an in-memory database.
+For example, if you are running Redis in Docker:
+
+    docker run -d --name redis -p 6379:6379 -v redis-volume:/data redis \
+        --requirepass PASSWORD --appendonly yes
+
+And set `celery_docker_broker_url: redis://:PASSWORD@redis.example.org:6379`
+
+
+### Long-running tasks
+
+The default Celery configuration is designed for handling short tasks.
+There are several changes that can be made to improve the processing of long-running tasks, see the [configuration](http://docs.celeryproject.org/en/latest/configuration.html) and [optimising](http://docs.celeryproject.org/en/latest/userguide/optimizing.html) docs.
+
+For example, use the `-Ofair` option `celery_docker_opts: -Ofair`
 
 
 Author Information
