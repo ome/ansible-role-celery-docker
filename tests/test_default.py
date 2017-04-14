@@ -36,10 +36,11 @@ def test_celery_task(Command, File, Sudo):
     # WARNING: If the network is particularly slow the download of busybox
     # may take too long
     for i in xrange(20):
-        f = File('/tmp/celery/output.txt')
+        got_outputs = (File('/tmp/celery/log.out').exists and
+                       File('/tmp/celery/output.txt').exists)
         # Sleep first to allow time for writing
-        sleep(3)
-        if f.exists:
+        sleep(10)
+        if got_outputs:
             break
 
     flog = File('/tmp/celery/log.out')
