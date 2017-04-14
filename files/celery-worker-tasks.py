@@ -5,6 +5,7 @@ import os
 import sys
 import docker
 import errno
+from pwd import getpwnam
 from random import uniform
 
 from celery import Celery
@@ -38,7 +39,7 @@ def run_docker(self, image, command, user=None,
     """
     :param image: Docker image, may include a tag
     :param command: Command line to be passed to image
-    :param user: Run the container as this user
+    :param user: Run the container as this user (name or UID)
     :param logoutfile: Absolute host path to an output log file, the parent
            directory must already exist and must be writeable by the `celery`
            user
@@ -59,8 +60,15 @@ def run_docker(self, image, command, user=None,
         stderr=True,
         stdout=True,
     )
+
     if user is not None:
-        kwargs['user'] = user
+        # Docker requires a UID
+        try:
+            uid = int(user)
+        except ValueError:
+            uid = getpwnam(user).pw_uid
+        kwargs['user'] = uid
+
     # kwargs['cpu_shares'] = 1
 
     volumes = {}
