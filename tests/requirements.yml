@@ -1,5 +1,3 @@
 - src: openmicroscopy.basedeps
-- name: openmicroscopy.docker
-  src: https://github.com/manics/ansible-role-docker.git
-  version: docker-refactor
+- src: openmicroscopy.docker
 - src: openmicroscopy.redis
