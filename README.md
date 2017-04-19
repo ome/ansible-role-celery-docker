@@ -58,7 +58,7 @@ Example playbook
       roles:
       - role: openmicroscopy.docker
       - role: openmicroscopy.redis
-      - role: celery-docker
+      - role: openmicroscopy.celery-docker
 
 
 Advanced setup
