@@ -1,0 +1,8 @@
+# {{ ansible_managed }}
+# Celery systemd environment file
+# http://docs.celeryproject.org/en/latest/userguide/daemonizing.html#generic-systemd-celery-example
+CELERYD_NODES=celery-worker-1
+CELERY_APP=tasks
+CELERYD_LOG_LEVEL={{ celery_docker_log_level }}
+CELERYD_CONCURRENCY={{ celery_docker_concurrency }}
+CELERYD_OPTS={{ celery_docker_opts | quote }}

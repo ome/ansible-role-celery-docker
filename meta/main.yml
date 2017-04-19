@@ -9,9 +9,3 @@ galaxy_info:
     versions:
     - 7
   galaxy_tags: []
-
-dependencies:
-- role: openmicroscopy.docker
-  docker_use_ipv4_nic_mtu: True
-- role: openmicroscopy.redis
-  when: celery_docker_setup_redis
