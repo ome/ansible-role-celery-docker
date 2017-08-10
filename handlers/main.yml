@@ -1,12 +1,10 @@
 ---
 # handlers file for celery-docker
 
-- name: reload systemd
-  become: yes
-  command: systemctl daemon-reload
 
 - name: reload celery-worker
   become: yes
-  service:
+  systemd:
+    daemon_reload: yes
     name: celery-worker.service
     state: restarted

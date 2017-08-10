@@ -93,12 +93,12 @@
     dest: "/etc/systemd/system/celery-worker.service"
     src: systemd-system-celery-worker-service.j2
   notify:
-  - reload systemd
   - reload celery-worker
 
 - name: celery docker | enable service
   become: yes
-  service:
+  systemd:
+    daemon_reload: yes
     name: celery-worker.service
     enabled: yes
     state: started
