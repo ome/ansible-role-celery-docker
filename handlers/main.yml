@@ -1,6 +1,9 @@
 ---
 # handlers file for celery-docker
 
+- name: create celery-worker tmpfiles
+  become: yes
+  command: systemd-tmpfiles --create /etc/tmpfiles.d/celery-worker.conf
 
 - name: reload celery-worker
   become: yes

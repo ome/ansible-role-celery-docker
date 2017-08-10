@@ -26,8 +26,15 @@
     owner: root
   - path: "{{ celery_docker_var_log }}"
     owner: celery
-  - path: "{{ celery_docker_var_run }}"
-    owner: celery
+
+# celery_docker_var_run: /var/run is mounted on tmpfs
+- name: celery docker | var run tmpdir
+  become: yes
+  template:
+    dest: /etc/tmpfiles.d/celery-worker.conf
+    src: tmpfilesd-celery-worker-conf.j2
+  notify:
+  - create celery-worker tmpfiles
 
 # The distribution python-virtualenv is too old
 - name: celery docker | download virtualenv
