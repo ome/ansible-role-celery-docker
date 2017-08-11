@@ -1,12 +1,13 @@
 ---
 # handlers file for celery-docker
 
-- name: reload systemd
+- name: create celery-worker tmpfiles
   become: yes
-  command: systemctl daemon-reload
+  command: systemd-tmpfiles --create /etc/tmpfiles.d/celery-worker.conf
 
 - name: reload celery-worker
   become: yes
-  service:
+  systemd:
+    daemon_reload: yes
     name: celery-worker.service
     state: restarted
