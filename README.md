@@ -1,6 +1,9 @@
 Celery Docker
 =============
 
+[![Build Status](https://travis-ci.org/ome/ansible-role-celery-docker.svg)](https://travis-ci.org/ome/ansible-role-celery-docker)
+[![Ansible Role](https://img.shields.io/ansible/role/41956.svg)](https://galaxy.ansible.com/ome/celery_docker/)
+
 Celery distributed processing with Docker.
 This role is considered developmental.
 
@@ -13,7 +16,8 @@ See `meta/main.yml`
 This role requires Docker to be running on the target hosts.
 Celery requires a broker such as Redis, either on the current or a remote server.
 
-For example, you can use the `openmicroscopy.docker` and `openmicroscopy.redis` roles to set them up, see the example playbook.
+For example, you can use the `ome.docker` and `ome.redis` roles to set them
+up, see the example playbook.
 
 
 Variables
@@ -56,9 +60,9 @@ Example playbook
 
     - hosts: localhost
       roles:
-      - role: openmicroscopy.docker
-      - role: openmicroscopy.redis
-      - role: openmicroscopy.celery-docker
+      - role: ome.docker
+      - role: ome.redis
+      - role: ome.celery_docker
 
 
 Advanced setup
