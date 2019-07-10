@@ -15,6 +15,7 @@ def test_services_running_and_enabled(Service, name):
     assert Service(name).is_running
     assert Service(name).is_enabled
 
+
 @pytest.mark.skip(reason="needs to be reviewed")
 def test_celery_task(Command, File, Sudo):
     with Sudo():
