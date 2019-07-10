@@ -2,7 +2,7 @@ Celery Docker
 =============
 
 [![Build Status](https://travis-ci.org/ome/ansible-role-celery-docker.svg)](https://travis-ci.org/ome/ansible-role-celery-docker)
-[![Ansible Role](https://img.shields.io/ansible/role/41956.svg)](https://galaxy.ansible.com/ome/celery_docker/)
+[![Ansible Role](https://img.shields.io/ansible/role/41957.svg)](https://galaxy.ansible.com/ome/celery_docker/)
 
 Celery distributed processing with Docker.
 This role is considered developmental.
